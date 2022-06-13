@@ -4,6 +4,7 @@ import (
 	"context"
 	carpb "coolcar/car/api/gen/v1"
 	"coolcar/car/dao"
+	mq "coolcar/car/rabbitmq/mq_interface"
 	"coolcar/shared/id"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,11 +17,7 @@ type Service struct {
 	carpb.UnimplementedCarServiceServer
 	Logger    *zap.Logger
 	Mongo     *dao.Mongo
-	Publisher Publisher
-}
-
-type Publisher interface {
-	Publish(ctx context.Context, entity *carpb.CarEntity) error
+	Publisher mq.Publisher
 }
 
 func (s *Service) CreateCar(c context.Context, req *carpb.CreateCarRequest) (*carpb.CarEntity, error) {

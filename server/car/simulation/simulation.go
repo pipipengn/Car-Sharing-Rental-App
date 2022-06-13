@@ -3,6 +3,7 @@ package simulation
 import (
 	"context"
 	carpb "coolcar/car/api/gen/v1"
+	mq "coolcar/car/rabbitmq/mq_interface"
 	"go.uber.org/zap"
 	"time"
 )
@@ -10,11 +11,7 @@ import (
 type Contorller struct {
 	Logger     *zap.Logger
 	CarService carpb.CarServiceClient
-	Subscriber Subscriber
-}
-
-type Subscriber interface {
-	Subscribe(ctx context.Context) (chan *carpb.CarEntity, func(), error)
+	Subscriber mq.Subscriber
 }
 
 func (c *Contorller) RunSimulations(ctx context.Context) {
