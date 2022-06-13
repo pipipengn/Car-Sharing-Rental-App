@@ -77,7 +77,6 @@ func (s *Service) CreateTrip(ctx context.Context, request *rentalpb.CreateTripRe
 		return nil, status.Error(codes.Internal, "")
 	}
 
-	// vehicle unlock
 	go func() {
 		if err = s.CarManager.Unlock(context.Background(), carID, aid, objid.ToTripID(tripRecord.ID)); err != nil {
 			s.Logger.Error("cannot unlock car", zap.Error(err))

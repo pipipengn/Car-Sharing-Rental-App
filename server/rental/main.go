@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	blobpb "coolcar/blob/api/gen/v1"
+	carpb "coolcar/car/api/gen/v1"
 	"coolcar/rental/ai"
 	rentalpb "coolcar/rental/api/gen/v1"
 	"coolcar/rental/profile"
@@ -45,6 +46,11 @@ func main() {
 		logger.Fatal("cannot connect blob service", zap.Error(err))
 	}
 
+	cconn, err := grpc.Dial("localhost:8084", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("cannot connect car service", zap.Error(err))
+	}
+
 	db := mongoClient.Database("coolcar")
 	logger.Sugar().Fatal(server.RunGRPCServer(&server.GRPCConfig{
 		Name:              "rental",
@@ -59,14 +65,15 @@ func main() {
 				PhotoGetExpire: 500 * time.Second,
 				PhotoPutExpire: 500 * time.Second,
 			}
-			rentalpb.RegisterTripServiceServer(s, &trip.Service{
+			tripService := &trip.Service{
 				Logger:         logger,
 				ProfileManager: &pf.Manager{Fetcher: profileService},
-				CarManager:     &car.Manager{},
+				CarManager:     &car.Manager{CarService: carpb.NewCarServiceClient(cconn)},
 				POIManager:     &poi.Manager{},
 				Mongo:          tripdao.NewMongo(db),
 				DistanceCalc:   ai.Client{AIClient: coolenvpb.NewAIServiceClient(aconn)},
-			})
+			}
+			rentalpb.RegisterTripServiceServer(s, tripService)
 			rentalpb.RegisterProfileServiceServer(s, profileService)
 		},
 	}))

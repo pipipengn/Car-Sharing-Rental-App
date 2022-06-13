@@ -261,16 +261,16 @@ type carManager struct {
 	unlockErr error
 }
 
-func (c *carManager) Verify(context.Context, id.CarID, *rentalpb.Location) error {
-	return c.verifyErr
+func (m *carManager) Verify(context.Context, id.CarID, *rentalpb.Location) error {
+	return m.verifyErr
 }
 
-func (c *carManager) Unlock(context.Context, id.CarID, id.AccountID, id.TripID) error {
-	return c.unlockErr
+func (m *carManager) Unlock(context.Context, id.CarID, id.AccountID, id.TripID) error {
+	return m.unlockErr
 }
 
-func (c *carManager) Lock(context.Context, id.CarID) error {
-	return c.unlockErr
+func (m *carManager) Lock(context.Context, id.CarID) error {
+	return nil
 }
 
 func TestMain(m *testing.M) {
