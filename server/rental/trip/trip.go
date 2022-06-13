@@ -153,14 +153,15 @@ func (s *Service) UpdateTrip(ctx context.Context, request *rentalpb.UpdateTripRe
 		curLocation = request.Current
 	}
 	trip.Trip.Current = s.calcCurrentStatus(ctx, trip.Trip.Current, curLocation)
+
 	if request.EndTrip {
 		trip.Trip.Status = rentalpb.TripStatus_FINISHED
 		trip.Trip.End = trip.Trip.Current
 		if err := s.CarManager.Lock(ctx, id.CarID(trip.Trip.CarId)); err != nil {
 			return nil, status.Errorf(codes.FailedPrecondition, "cannot lock car: %v", err)
 		}
-		// TODO need car inform
 	}
+
 	// trip.UpdatedAt   optimistic locking
 	err = s.Mongo.UpdateTrip(ctx, tid, aid, trip.UpdatedAt, trip.Trip)
 	return trip.Trip, nil

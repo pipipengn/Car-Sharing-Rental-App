@@ -5,11 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-<div>发送消息</div>
+<div>Send Message</div>
 <label for="msgContent"></label><input type="text" id="msgContent">
-<input type="button" value="发送" onclick="CHAT.chat()">
+<input type="button" value="send" onclick="CHAT.chat()">
 
-<div>接收消息</div>
+<div>Receive Message</div>
 <div id="receiceMsg" style="background-color: gainsboro"></div>
 
 <script type="application/javascript">
@@ -18,24 +18,24 @@
         socket: null,
         init: function () {
             if (window.WebSocket) {
-                CHAT.socket = new WebSocket("ws://192.168.1.194:9000/ws")
+                CHAT.socket = new WebSocket("ws://192.168.1.194:9090/ws")
                 CHAT.socket.onopen = function () {
-                    console.log("连接成功")
+                    console.log("connect success")
                 }
                 CHAT.socket.onclose = function () {
-                    console.log("连接关闭")
+                    console.log("connection close")
                 }
                 CHAT.socket.onerror = function () {
-                    console.log("错误")
+                    console.log("error")
                 }
                 CHAT.socket.onmessage = function (e) {
-                    console.log("接收到消息" + e.data)
+                    console.log("received message: " + e.data)
                     const reveiveMsg = document.getElementById("receiceMsg");
                     const html = reveiveMsg.innerHTML;
-                    reveiveMsg.innerHTML = html + "<br/>" +e.data
+                    reveiveMsg.innerHTML = html + "<br/>" + e.data
                 }
             } else {
-                alert("不支持websocket")
+                alert("unsupport websocket")
             }
         },
         chat: function () {
