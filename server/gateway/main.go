@@ -5,12 +5,14 @@ import (
 	authpb "coolcar/auth/api/gen/v1"
 	carpb "coolcar/car/api/gen/v1"
 	rentalpb "coolcar/rental/api/gen/v1"
+	"coolcar/shared/auth"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
+	"net/textproto"
 )
 
 func main() {
@@ -26,6 +28,11 @@ func main() {
 	mux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 		OrigName:    true,
 		EnumsAsInts: true,
+	}), runtime.WithIncomingHeaderMatcher(func(key string) (string, bool) {
+		if key == textproto.CanonicalMIMEHeaderKey(runtime.MetadataHeaderPrefix+auth.ImpersonateAccountHeader) {
+			return "", false
+		}
+		return runtime.DefaultHeaderMatcher(key)
 	}))
 
 	serverCongig := []struct {

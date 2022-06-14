@@ -60,15 +60,19 @@ func (c *Controller) RunSimulations(ctx context.Context) {
 		case carUpdate := <-carCh:
 			ch := carChans[carUpdate.Id]
 			if ch != nil {
-				ch <- carUpdate.Car
+				go func() {
+					ch <- carUpdate.Car
+				}()
 			}
 		case posUpdate := <-posCh:
 			ch := posChans[posUpdate.CarId]
 			if ch != nil {
-				ch <- &carpb.Location{
-					Latitude:  posUpdate.Pos.Latitude,
-					Longitude: posUpdate.Pos.Longitude,
-				}
+				go func() {
+					ch <- &carpb.Location{
+						Latitude:  posUpdate.Pos.Latitude,
+						Longitude: posUpdate.Pos.Longitude,
+					}
+				}()
 			}
 		}
 	}
