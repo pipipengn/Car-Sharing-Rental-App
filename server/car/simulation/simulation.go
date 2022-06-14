@@ -135,7 +135,7 @@ func (c *Controller) unlockCar(ctx context.Context, car *carpb.CarEntity) (*carp
 
 	if _, err := c.AIService.SimulateCarPos(ctx, &coolenvpb.SimulateCarPosRequest{
 		CarId: car.Id,
-		Type:  coolenvpb.PosType_NINGBO,
+		Type:  coolenvpb.PosType_RANDOM,
 		InitialPos: &coolenvpb.Location{
 			Latitude:  car.Car.Position.Latitude,
 			Longitude: car.Car.Position.Longitude,

@@ -15,7 +15,7 @@ type Options struct {
 	CarSubscriber mq.CarSubscriber
 }
 
-func NewHandler(o Options) gin.HandlerFunc {
+func NewHandler(o *Options) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ws, err := o.Upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {

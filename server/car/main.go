@@ -6,9 +6,12 @@ import (
 	"coolcar/car/car"
 	"coolcar/car/dao"
 	"coolcar/car/rabbitmq"
+	r2 "coolcar/car/redis"
 	"coolcar/car/simulation"
 	"coolcar/car/simulation/position"
+	tripupdater "coolcar/car/trip_updater"
 	"coolcar/car/ws"
+	rentalpb "coolcar/rental/api/gen/v1"
 	coolenvpb "coolcar/shared/carenv"
 	"coolcar/shared/server"
 	"github.com/gin-gonic/gin"
@@ -21,6 +24,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -74,9 +78,23 @@ func main() {
 	}
 	go simulatorContorller.RunSimulations(context.Background())
 
+	// trip updater
+	tripConn, err := grpc.Dial("localhost:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("cannot connect trip service", zap.Error(err))
+	}
+	tuService := tripupdater.NewService(&tripupdater.Options{
+		Sub:             subscriber,
+		TripService:     rentalpb.NewTripServiceClient(tripConn),
+		Logger:          logger,
+		Redis:           r2.NewRedisService("localhost:6379"),
+		RedisExpireTime: 3 * time.Second,
+	})
+	go tuService.RunUpdator()
+
 	// websocket
 	r := gin.Default()
-	r.GET("/ws", ws.NewHandler(ws.Options{
+	r.GET("/ws", ws.NewHandler(&ws.Options{
 		Logger:        logger,
 		CarSubscriber: subscriber,
 		Upgrader: &websocket.Upgrader{

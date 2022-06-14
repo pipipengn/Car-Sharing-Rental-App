@@ -50,12 +50,17 @@ func NewInterceptor(publicKeyFile string) (grpc.UnaryServerInterceptor, error) {
 }
 
 func (i *interceptor) HandleReq(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+	aid := impersonationFromContext(ctx)
+	if aid != "" {
+		return handler(ContextWithAccountID(ctx, id.AccountID(aid)), req)
+	}
+
 	tkn, err := tokenFromContext(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "")
 	}
 
-	aid, err := i.Verifier.Verify(tkn)
+	aid, err = i.Verifier.Verify(tkn)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "token not valid: %v", err)
 	}
@@ -96,4 +101,17 @@ func AccountIDFromContext(ctx context.Context) (id.AccountID, error) {
 		return "", status.Error(codes.Unauthenticated, "")
 	}
 	return aid, nil
+}
+
+func impersonationFromContext(c context.Context) string {
+	m, ok := metadata.FromIncomingContext(c)
+	if !ok {
+		return ""
+	}
+
+	imp := m[ImpersonateAccountHeader]
+	if len(imp) == 0 {
+		return ""
+	}
+	return imp[0]
 }

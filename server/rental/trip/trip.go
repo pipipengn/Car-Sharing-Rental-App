@@ -167,7 +167,8 @@ func (s *Service) UpdateTrip(ctx context.Context, request *rentalpb.UpdateTripRe
 	return trip.Trip, nil
 }
 
-const centsPerSec = 0.7
+const centsPerSec = 0.3
+const centsPerKm = 0.7
 
 var nowFunc = func() int64 {
 	return time.Now().Unix()
@@ -193,7 +194,7 @@ func (s *Service) calcCurrentStatus(c context.Context, last *rentalpb.LocationSt
 
 	return &rentalpb.LocationStatus{
 		Location:     cur,
-		FeeCent:      last.FeeCent + int32(centsPerSec*i),
+		FeeCent:      last.FeeCent + int32(centsPerSec*i+centsPerKm*km),
 		KmDriven:     last.KmDriven + km,
 		PoiName:      poi,
 		TimestampSec: now,
