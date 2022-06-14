@@ -10,9 +10,9 @@ import (
 )
 
 type Options struct {
-	Logger     *zap.Logger
-	Upgrader   *websocket.Upgrader
-	Subscriber mq.Subscriber
+	Logger        *zap.Logger
+	Upgrader      *websocket.Upgrader
+	CarSubscriber mq.CarSubscriber
 }
 
 func NewHandler(o Options) gin.HandlerFunc {
@@ -26,7 +26,7 @@ func NewHandler(o Options) gin.HandlerFunc {
 			_ = ws.Close()
 		}(ws)
 
-		msgs, cleanFunc, err := o.Subscriber.Subscribe(context.Background())
+		msgs, cleanFunc, err := o.CarSubscriber.Subscribe(context.Background())
 		defer cleanFunc()
 		if err != nil {
 			o.Logger.Error("cannot subscribe", zap.Error(err))

@@ -26,9 +26,9 @@ func TestCarUpdate(t *testing.T) {
 	}
 
 	s := &Service{
-		Logger:    logger,
-		Mongo:     dao.NewMongo(mc.Database("coolcar")),
-		Publisher: &testPublisher{},
+		Logger:       logger,
+		Mongo:        dao.NewMongo(mc.Database("coolcar")),
+		CarPublisher: &testPublisher{},
 	}
 
 	carID := id.CarID("5f8132eb22814bf629489056")

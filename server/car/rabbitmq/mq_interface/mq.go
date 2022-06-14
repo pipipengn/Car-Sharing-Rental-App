@@ -3,12 +3,17 @@ package mq
 import (
 	"context"
 	carpb "coolcar/car/api/gen/v1"
+	coolenvpb "coolcar/shared/carenv"
 )
 
-type Publisher interface {
+type CarPublisher interface {
 	Publish(ctx context.Context, entity *carpb.CarEntity) error
 }
 
-type Subscriber interface {
+type CarSubscriber interface {
 	Subscribe(ctx context.Context) (chan *carpb.CarEntity, func(), error)
+}
+
+type PosSubscriber interface {
+	Subscribe(ctx context.Context) (chan *coolenvpb.CarPosUpdate, func(), error)
 }

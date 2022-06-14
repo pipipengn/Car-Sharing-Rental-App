@@ -54,7 +54,7 @@ type Subscriber struct {
 	logger   *zap.Logger
 }
 
-func NewScriber(conn *amqp.Connection, exchange string, logger *zap.Logger) (*Subscriber, error) {
+func NewSubscriber(conn *amqp.Connection, exchange string, logger *zap.Logger) (*Subscriber, error) {
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, fmt.Errorf("cannot allocate channel: %v", err)

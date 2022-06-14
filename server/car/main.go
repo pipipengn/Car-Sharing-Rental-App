@@ -7,7 +7,9 @@ import (
 	"coolcar/car/dao"
 	"coolcar/car/rabbitmq"
 	"coolcar/car/simulation"
+	"coolcar/car/simulation/position"
 	"coolcar/car/ws"
+	coolenvpb "coolcar/shared/carenv"
 	"coolcar/shared/server"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -50,22 +52,33 @@ func main() {
 	if err != nil {
 		logger.Fatal("cannot connect car service", zap.Error(err))
 	}
-	subscriber, err := rabbitmq.NewScriber(rabbitconn, exchange, logger)
+	subscriber, err := rabbitmq.NewSubscriber(rabbitconn, exchange, logger)
 	if err != nil {
 		logger.Fatal("cannot create subscriber", zap.Error(err))
 	}
-	simulatorContorller := &simulation.Contorller{
-		Logger:     logger,
-		CarService: carpb.NewCarServiceClient(carConn),
-		Subscriber: subscriber,
+	aiConn, err := grpc.Dial("localhost:18001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("cannot connect ai service", zap.Error(err))
+	}
+
+	posSub, err := rabbitmq.NewSubscriber(rabbitconn, "pos_sim", logger)
+	simulatorContorller := &simulation.Controller{
+		Logger:        logger,
+		CarService:    carpb.NewCarServiceClient(carConn),
+		CarSubscriber: subscriber,
+		PosSubscriber: &position.Subscriber{
+			Sub:    posSub,
+			Logger: logger,
+		},
+		AIService: coolenvpb.NewAIServiceClient(aiConn),
 	}
 	go simulatorContorller.RunSimulations(context.Background())
 
 	// websocket
 	r := gin.Default()
 	r.GET("/ws", ws.NewHandler(ws.Options{
-		Logger:     logger,
-		Subscriber: subscriber,
+		Logger:        logger,
+		CarSubscriber: subscriber,
 		Upgrader: &websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
@@ -87,9 +100,9 @@ func main() {
 		Addr:   ":8084",
 		RegisterFunc: func(s *grpc.Server) {
 			carpb.RegisterCarServiceServer(s, &car.Service{
-				Logger:    logger,
-				Mongo:     dao.NewMongo(mongoClient.Database("coolcar")),
-				Publisher: publisher,
+				Logger:       logger,
+				Mongo:        dao.NewMongo(mongoClient.Database("coolcar")),
+				CarPublisher: publisher,
 			})
 		},
 	}))

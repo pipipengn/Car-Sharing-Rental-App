@@ -15,9 +15,9 @@ import (
 
 type Service struct {
 	carpb.UnimplementedCarServiceServer
-	Logger    *zap.Logger
-	Mongo     *dao.Mongo
-	Publisher mq.Publisher
+	Logger       *zap.Logger
+	Mongo        *dao.Mongo
+	CarPublisher mq.CarPublisher
 }
 
 func (s *Service) CreateCar(c context.Context, req *carpb.CreateCarRequest) (*carpb.CarEntity, error) {
@@ -111,7 +111,7 @@ func (s *Service) UpdateCar(c context.Context, req *carpb.UpdateCarRequest) (*ca
 }
 
 func (s *Service) publish(c context.Context, car *dao.CarRecord) {
-	err := s.Publisher.Publish(c, &carpb.CarEntity{
+	err := s.CarPublisher.Publish(c, &carpb.CarEntity{
 		Id:  car.ID.Hex(),
 		Car: car.Car,
 	})
