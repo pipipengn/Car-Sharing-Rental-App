@@ -15,6 +15,7 @@ import (
 	tripdao "coolcar/rental/trip/dao"
 	coolenvpb "coolcar/shared/carenv"
 	"coolcar/shared/server"
+	"github.com/namsral/flag"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
@@ -24,6 +25,13 @@ import (
 	"time"
 )
 
+var addr = flag.String("addr", ":8082", "address to listen")
+var mongoURI = flag.String("mongo_uri", "mongodb://localhost:27017/coolcar?readPreference=primary&ssl=false", "mongo uri")
+var blobAddr = flag.String("blob_addr", "localhost:8083", "address for blob service")
+var aiAddr = flag.String("ai_addr", "localhost:18001", "address for ai service")
+var carAddr = flag.String("car_addr", "localhost:8084", "address for car service")
+var authPublicKeyFile = flag.String("auth_public_key_file", "shared/auth/public.key", "public key file for auth")
+
 func main() {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
@@ -31,22 +39,22 @@ func main() {
 	}
 
 	c := context.Background()
-	mongoClient, err := mongo.Connect(c, options.Client().ApplyURI("mongodb://localhost:27017/coolcar?readPreference=primary&ssl=false"))
+	mongoClient, err := mongo.Connect(c, options.Client().ApplyURI(*mongoURI))
 	if err != nil {
 		logger.Fatal("cannot connect mongodb", zap.Error(err))
 	}
 
-	aconn, err := grpc.Dial("localhost:18001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	aconn, err := grpc.Dial(*aiAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("cannot connect aiservice", zap.Error(err))
 	}
 
-	bconn, err := grpc.Dial("localhost:8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	bconn, err := grpc.Dial(*blobAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("cannot connect blob service", zap.Error(err))
 	}
 
-	cconn, err := grpc.Dial("localhost:8084", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cconn, err := grpc.Dial(*carAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("cannot connect car service", zap.Error(err))
 	}
@@ -55,8 +63,8 @@ func main() {
 	logger.Sugar().Fatal(server.RunGRPCServer(&server.GRPCConfig{
 		Name:              "rental",
 		Logger:            logger,
-		Addr:              ":8082",
-		AuthPublicKeyFile: "shared/auth/public.key",
+		Addr:              *addr,
+		AuthPublicKeyFile: *authPublicKeyFile,
 		RegisterFunc: func(s *grpc.Server) {
 			profileService := &profile.Service{
 				Mongo:          profiledao.NewMongo(db),

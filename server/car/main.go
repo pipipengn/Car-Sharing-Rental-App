@@ -16,6 +16,7 @@ import (
 	"coolcar/shared/server"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/namsral/flag"
 	"github.com/streadway/amqp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -27,6 +28,15 @@ import (
 	"time"
 )
 
+var addr = flag.String("addr", ":8084", "address to listen")
+var wsAddr = flag.String("ws_addr", ":9090", "websocket address to listen")
+var mongoURI = flag.String("mongo_uri", "mongodb://localhost:27017/coolcar?readPreference=primary&ssl=false", "mongo uri")
+var amqpURL = flag.String("amqp_url", "amqp://guest:guest@localhost:5672/", "amqp url")
+var carAddr = flag.String("car_addr", "localhost:8084", "address for car service")
+var tripAddr = flag.String("trip_addr", "localhost:8082", "address for trip service")
+var aiAddr = flag.String("ai_addr", "localhost:18001", "address for ai service")
+var redisAddr = flag.String("redis_addr", "localhost:6379", "address for redis service")
+
 func main() {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
@@ -35,13 +45,13 @@ func main() {
 	c := context.Background()
 
 	// mongo
-	mongoClient, err := mongo.Connect(c, options.Client().ApplyURI("mongodb://localhost:27017/coolcar?readPreference=primary&ssl=false"))
+	mongoClient, err := mongo.Connect(c, options.Client().ApplyURI(*mongoURI))
 	if err != nil {
 		logger.Fatal("cannot connect mongodb", zap.Error(err))
 	}
 
 	// rabbitmq
-	rabbitconn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	rabbitconn, err := amqp.Dial(*amqpURL)
 	if err != nil {
 		logger.Fatal("cannot dial rabbitmq", zap.Error(err))
 	}
@@ -52,7 +62,7 @@ func main() {
 	}
 
 	// car simulation
-	carConn, err := grpc.Dial("localhost:8084", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	carConn, err := grpc.Dial(*carAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("cannot connect car service", zap.Error(err))
 	}
@@ -60,7 +70,7 @@ func main() {
 	if err != nil {
 		logger.Fatal("cannot create subscriber", zap.Error(err))
 	}
-	aiConn, err := grpc.Dial("localhost:18001", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	aiConn, err := grpc.Dial(*aiAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("cannot connect ai service", zap.Error(err))
 	}
@@ -79,7 +89,7 @@ func main() {
 	go simulatorContorller.RunSimulations(context.Background())
 
 	// trip updater
-	tripConn, err := grpc.Dial("localhost:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	tripConn, err := grpc.Dial(*tripAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal("cannot connect trip service", zap.Error(err))
 	}
@@ -87,7 +97,7 @@ func main() {
 		Sub:             subscriber,
 		TripService:     rentalpb.NewTripServiceClient(tripConn),
 		Logger:          logger,
-		Redis:           r2.NewRedisService("localhost:6379"),
+		Redis:           r2.NewRedisService(*redisAddr),
 		RedisExpireTime: 3 * time.Second,
 	})
 	go tuService.RunUpdator()
@@ -104,7 +114,7 @@ func main() {
 		},
 	}))
 	go func() {
-		addr := ":9090"
+		addr := *wsAddr
 		logger.Info("Websocket Service started", zap.String("addr", addr))
 		if err := r.Run(addr); err != nil {
 			logger.Fatal("cannot create websocket", zap.Error(err))
@@ -115,7 +125,7 @@ func main() {
 	logger.Sugar().Fatal(server.RunGRPCServer(&server.GRPCConfig{
 		Name:   "car",
 		Logger: logger,
-		Addr:   ":8084",
+		Addr:   *addr,
 		RegisterFunc: func(s *grpc.Server) {
 			carpb.RegisterCarServiceServer(s, &car.Service{
 				Logger:       logger,
