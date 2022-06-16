@@ -1,4 +1,5 @@
 DOMAIN=$1
-Account=$2
-docker tag coolcar-"$DOMAIN":latest "$Account".dkr.ecr.us-west-2.amazonaws.com/coolcar:"$DOMAIN"
-docker push "$Account".dkr.ecr.us-west-2.amazonaws.com/coolcar:"$DOMAIN"
+
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/l4j6s3h2
+docker tag coolcar-"$DOMAIN":latest public.ecr.aws/l4j6s3h2/coolcar:"$DOMAIN"
+docker push public.ecr.aws/l4j6s3h2/coolcar:"$DOMAIN"
