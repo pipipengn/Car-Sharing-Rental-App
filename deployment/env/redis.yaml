@@ -15,7 +15,7 @@ spec:
         app: redis
     spec:
       containers:
-        - name: env
+        - name: redis
           image: redis
           imagePullPolicy: IfNotPresent
           ports:

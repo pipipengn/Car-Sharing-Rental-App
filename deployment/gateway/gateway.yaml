@@ -24,6 +24,12 @@ spec:
           limits:
             cpu: 100m
             memory: 128Mi
+        env:
+          - name: AUTH_ADDR
+            valueFrom:
+              configMapKeyRef:
+                key: auth
+                name: endpoints
 
 ---
 apiVersion: v1

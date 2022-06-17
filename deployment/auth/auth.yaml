@@ -19,7 +19,7 @@ spec:
           image: public.ecr.aws/l4j6s3h2/coolcar:auth-1.0.2
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           resources:
             limits:
               cpu: 100m
@@ -40,6 +40,19 @@ spec:
                 secretKeyRef:
                   key: appsecret
                   name: wechat
+            - name: PRIVATE_KEY_FILE
+              value: /sec/private.key
+          volumeMounts:
+            - mountPath: /sec
+              name: auth
+              readOnly: true
+      volumes:
+        - name: auth
+          secret:
+            secretName: auth
+            items:
+              - key: privatekey
+                path: private.key
 
 ---
 apiVersion: v1
@@ -50,7 +63,7 @@ spec:
   selector:
     app: auth
   ports:
-    - name: http
+    - name: grpc
       protocol: TCP
-      port: 8080
+      port: 8081
   type: ClusterIP
