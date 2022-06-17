@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: public.ecr.aws/l4j6s3h2/coolcar:auth
+          image: public.ecr.aws/l4j6s3h2/coolcar:auth-1.0.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -24,6 +24,22 @@ spec:
             limits:
               cpu: 100m
               memory: 128Mi
+          env:
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: mongo
+                  name: endpoints
+            - name: WECHAT_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  key: appid
+                  name: wechat
+            - name: WECHAT_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: appsecret
+                  name: wechat
 
 ---
 apiVersion: v1

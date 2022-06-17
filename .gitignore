@@ -1,1 +1,5 @@
 .idea
+server/auth/token/private.key
+server/shared/auth/public.key
+server/try
+
