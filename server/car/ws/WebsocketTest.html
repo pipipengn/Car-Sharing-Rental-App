@@ -18,7 +18,7 @@
         socket: null,
         init: function () {
             if (window.WebSocket) {
-                CHAT.socket = new WebSocket("ws://192.168.1.194:9090/ws")
+                CHAT.socket = new WebSocket("ws://a222d86e25dbd403e82dad35b982c4e0-1053416168.us-west-2.elb.amazonaws.com:8080/ws")
                 CHAT.socket.onopen = function () {
                     console.log("connect success")
                 }
