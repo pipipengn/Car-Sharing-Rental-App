@@ -30,6 +30,21 @@ spec:
               configMapKeyRef:
                 key: auth
                 name: endpoints
+          - name: TRIP_ADDR
+            valueFrom:
+              configMapKeyRef:
+                key: trip
+                name: endpoints
+          - name: PROFILE_ADDR
+            valueFrom:
+              configMapKeyRef:
+                key: profile
+                name: endpoints
+          - name: CAR_ADDR
+            valueFrom:
+              configMapKeyRef:
+                key: car
+                name: endpoints
 
 ---
 apiVersion: v1
