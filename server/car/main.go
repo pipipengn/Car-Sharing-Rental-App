@@ -38,6 +38,8 @@ var aiAddr = flag.String("ai_addr", "localhost:18001", "address for ai service")
 var redisAddr = flag.String("redis_addr", "localhost:6379", "address for redis service")
 
 func main() {
+	flag.Parse()
+
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatalf("cannot create logger: %v", err)

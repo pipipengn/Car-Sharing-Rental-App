@@ -33,6 +33,8 @@ var carAddr = flag.String("car_addr", "localhost:8084", "address for car service
 var authPublicKeyFile = flag.String("auth_public_key_file", "shared/auth/public.key", "public key file for auth")
 
 func main() {
+	flag.Parse()
+
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		log.Fatalf("cannot create logger: %v", err)

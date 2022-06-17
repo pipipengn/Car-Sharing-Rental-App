@@ -22,7 +22,7 @@ func RunGRPCServer(c *GRPCConfig) error {
 	if c.AuthPublicKeyFile != "" {
 		interceptor, err := auth.NewInterceptor(c.AuthPublicKeyFile)
 		if err != nil {
-			c.Logger.Fatal("cannot create auth intercepter", nameField)
+			c.Logger.Fatal("cannot create auth intercepter", nameField, zap.Error(err))
 		}
 		opts = append(opts, grpc.UnaryInterceptor(interceptor))
 	}
