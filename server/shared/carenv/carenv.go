@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.23.0
 // 	protoc        v3.13.0
-// source: coolenv.proto
+// source: env.proto
 
 package coolenvpb
 
@@ -1117,5 +1117,5 @@ var _AIService_serviceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "coolenv.proto",
+	Metadata: "env.proto",
 }

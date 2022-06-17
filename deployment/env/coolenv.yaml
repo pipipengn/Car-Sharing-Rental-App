@@ -15,8 +15,8 @@ spec:
         app: coolenv
     spec:
       containers:
-        - name: coolenv
-          image: ccr.ccs.tencentyun.com/coolcar/coolenv:1.2
+        - name: env
+          image: ccr.ccs.tencentyun.com/coolcar/env:1.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5672
