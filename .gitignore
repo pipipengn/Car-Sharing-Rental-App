@@ -1,10 +1,6 @@
 .idea
-server/auth/token/private.key
-server/shared/auth/public.key
 server/try
 
-deployment/config/auth.yaml
-deployment/config/s3.yaml
-deployment/config/wechat.yaml
+
 
 
