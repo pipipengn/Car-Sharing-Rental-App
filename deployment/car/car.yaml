@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
         app: car
+        version: v1.2
     spec:
       containers:
         - name: car
-          image: public.ecr.aws/l4j6s3h2/coolcar:car-1.1
+          image: public.ecr.aws/l4j6s3h2/coolcar:car-1.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
@@ -55,6 +56,10 @@ spec:
                 configMapKeyRef:
                   key: redis
                   name: endpoints
+          livenessProbe:
+            exec:
+              command: [ "/bin/grpc-health-probe", "-addr=:8081" ]
+            initialDelaySeconds: 5
 ---
 apiVersion: v1
 kind: Service
@@ -70,4 +75,4 @@ spec:
     - name: http
       protocol: TCP
       port: 8080
-  type: LoadBalancer
+  type: ClusterIP

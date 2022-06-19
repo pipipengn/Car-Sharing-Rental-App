@@ -4,6 +4,8 @@ import (
 	"coolcar/shared/auth"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 )
 
@@ -29,6 +31,8 @@ func RunGRPCServer(c *GRPCConfig) error {
 
 	s := grpc.NewServer(opts...)
 	c.RegisterFunc(s)
+
+	grpc_health_v1.RegisterHealthServer(s, health.NewServer())
 
 	lis, err := net.Listen("tcp", c.Addr)
 	if err != nil {

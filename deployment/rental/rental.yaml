@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
         app: rental
+        version: v1.2
     spec:
       containers:
         - name: rental
-          image: public.ecr.aws/l4j6s3h2/coolcar:rental-1.1
+          image: public.ecr.aws/l4j6s3h2/coolcar:rental-1.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
@@ -67,6 +68,7 @@ spec:
   selector:
     app: rental
   ports:
-    - protocol: TCP
+    - name: grpc
+      protocol: TCP
       port: 8081
   type: ClusterIP

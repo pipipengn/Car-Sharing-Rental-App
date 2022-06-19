@@ -78,6 +78,11 @@ func main() {
 		}
 	}
 
+	http.HandleFunc("/healthz", func(writer http.ResponseWriter, request *http.Request) {
+		_, _ = writer.Write([]byte("ok"))
+	})
+	http.Handle("/", mux)
+
 	logger.Sugar().Infof("grpc gateway started at %s", *addr)
-	logger.Sugar().Fatal(http.ListenAndServe(*addr, mux))
+	logger.Sugar().Fatal(http.ListenAndServe(*addr, nil))
 }

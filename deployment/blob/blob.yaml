@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
         app: blob
+        version: v1.2
     spec:
       containers:
         - name: blob
-          image: public.ecr.aws/l4j6s3h2/coolcar:blob
+          image: public.ecr.aws/l4j6s3h2/coolcar:blob-1.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
@@ -40,6 +41,10 @@ spec:
                 secretKeyRef:
                   key: seckey
                   name: s3
+          livenessProbe:
+            exec:
+              command: [ "/bin/grpc-health-probe", "-addr=:8081" ]
+            initialDelaySeconds: 5
 
 ---
 apiVersion: v1

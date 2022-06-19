@@ -13,10 +13,11 @@ spec:
     metadata:
       labels:
         app: auth
+        version: v1.2
     spec:
       containers:
         - name: auth
-          image: public.ecr.aws/l4j6s3h2/coolcar:auth-1.0.2
+          image: public.ecr.aws/l4j6s3h2/coolcar:auth-1.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081
@@ -46,6 +47,10 @@ spec:
             - mountPath: /sec
               name: auth
               readOnly: true
+          livenessProbe:
+            exec:
+              command: [ "/bin/grpc-health-probe", "-addr=:8081" ]
+            initialDelaySeconds: 5
       volumes:
         - name: auth
           secret:

@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: endpoints
 data:
-  mongo: mongodb://coolenv:27017
+  mongo: mongodb://mongodb:27017
   amqp: amqp://guest:guest@coolenv:5672/
   ai: coolenv:18001
   auth: auth:8081

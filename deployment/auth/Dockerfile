@@ -6,10 +6,11 @@ COPY . /go/src/coolcar/server
 
 WORKDIR /go/src/coolcar/server
 RUN go install ./auth/...
-
+RUN go install github.com/grpc-ecosystem/grpc-health-probe@latest
 
 FROM alpine:3.16
 COPY --from=builder /go/bin/auth /bin/auth
+COPY --from=builder /go/bin/grpc-health-probe /bin/grpc-health-probe
 ENV ADDR=:8081
 
 EXPOSE 8081
