@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth
-          image: public.ecr.aws/l4j6s3h2/coolcar:auth-1.2
+          image: public.ecr.aws/qok1oq21/coolcar:auth-1.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081

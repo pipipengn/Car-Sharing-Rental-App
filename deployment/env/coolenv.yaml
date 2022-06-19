@@ -30,8 +30,8 @@ spec:
               cpu: 300m
               memory: 512Mi
           env:
-            - name: ICODE
-              value: JD27E747B4E42DE6C
+            - name: I
+              value: J
 ---
 apiVersion: v1
 kind: Service
