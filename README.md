@@ -52,6 +52,8 @@ Contain two sub-services: trip service and profile service
 
 ## Car Service
 
-Realized the CRUD of cars, lock and unlock cars, and car simulation
+Realized the CRUD of cars, lock and unlock cars
+
+Realized car simulation using go routine and channel
 
 ![architecture1.png](img/car.png)
