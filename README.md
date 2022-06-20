@@ -28,7 +28,7 @@ Realized the login function: use JWT and RSA asymmetric encryption to issue toke
 
 ## Blob Service
 
-Realized the management of user photos and driver licenses
+Realized the CRUD of user photos and driver licenses
 
 Using AWS S3 pre-signed URL and realized upload photo directly to S3 from frontend
 
@@ -40,15 +40,18 @@ Contain two sub-services: trip service and profile service
 
 1. profile service
 
-   realized the management of users' profile and used gRPC to call blob service to manage photo
+   realized the CRUD of users' profile and used gRPC to call blob service to manage photo
 
    ![architecture1.png](img/s3.png)
 
 2. trip service
 
-   Realized the management of trips
+   Realized the CRUD of trips
 
    
 
 ## Car Service
 
+Realized the CRUD of cars, lock and unlock cars, and car simulation
+
+![architecture1.png](img/car.png)
