@@ -5,7 +5,6 @@ import (
 	authpb "coolcar/auth/api/gen/v1"
 	"coolcar/auth/auth"
 	"coolcar/auth/dao"
-	"coolcar/auth/token"
 	"coolcar/auth/wx"
 	"coolcar/shared/server"
 	"github.com/namsral/flag"
@@ -48,9 +47,9 @@ func main() {
 					AppID:     *wechatAppID,
 					AppSecret: *wechatAppSecret,
 				},
-				Mongo:          dao.NewMongo(mongoClient.Database("coolcar")),
-				TokenExpire:    750 * time.Hour,
-				TokenGenerator: token.NewJWTTokenGen("coolcar/auth", token.PrivateKey(*privateKeyFile)),
+				Mongo:       dao.NewMongo(mongoClient.Database("coolcar")),
+				TokenExpire: 750 * time.Hour,
+				//TokenGenerator: token.NewJWTTokenGen("coolcar/auth", token.PrivateKey(*privateKeyFile)),
 			})
 		},
 	}))
