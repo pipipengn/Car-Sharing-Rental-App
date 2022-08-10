@@ -38,6 +38,7 @@ func (c *Controller) RunSimulations(ctx context.Context) {
 		c.Logger.Error("cannot subscribe car", zap.Error(err))
 		return
 	}
+
 	posCh, closeFunc2, err := c.PosSubscriber.Subscribe(ctx)
 	defer closeFunc2()
 	if err != nil {
